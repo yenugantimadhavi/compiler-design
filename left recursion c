@@ -1,0 +1,70 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX_RULES 10
+#define MAX_SYMBOLS 10
+
+int num_rules;
+char rules[MAX_RULES][MAX_SYMBOLS];
+
+void eliminateLeftRecursion() {
+    int i, j, k;
+    char new_rules[MAX_RULES][MAX_SYMBOLS];
+
+    for (i = 0; i < num_rules; i++) {
+        int length = strlen(rules[i]);
+        int common_prefix = 0;
+        
+        
+        while (common_prefix < length && rules[i][common_prefix] == rules[i + 1][common_prefix]) {
+            common_prefix++;
+        }
+
+        if (common_prefix > 0) {
+           
+            char new_non_terminal[MAX_SYMBOLS];
+            sprintf(new_non_terminal, "%c'", rules[i][0]);
+
+            
+            sprintf(new_rules[i], "%s%s'", &rules[i][common_prefix], new_non_terminal);
+            sprintf(new_rules[i + 1], "%s%s'", &rules[i + 1][common_prefix], new_non_terminal);
+
+           
+            for (j = i + 2; j < num_rules; j++) {
+                strcpy(new_rules[j], rules[j]);
+                strcat(new_rules[j], new_non_terminal);
+            }
+
+            
+            strcpy(new_rules[num_rules], "epsilon");
+            strcat(new_rules[num_rules], new_non_terminal);
+            num_rules++;
+        } else {
+            strcpy(new_rules[i], rules[i]);
+        }
+    }
+
+    for (i = 0; i < num_rules; i++) {
+        strcpy(rules[i], new_rules[i]);
+    }
+}
+
+int main() {
+    printf("Enter the number of rules: ");
+    scanf("%d", &num_rules);
+
+    printf("Enter the rules (one per line):\n");
+    for (int i = 0; i < num_rules; i++) {
+        scanf("%s", rules[i]);
+    }
+
+    eliminateLeftRecursion();
+
+    printf("\nGrammar after eliminating left recursion:\n");
+    for (int i = 0; i < num_rules; i++) {
+        printf("%s\n", rules[i]);
+    }
+
+    return 0;
+}
